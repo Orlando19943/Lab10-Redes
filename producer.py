@@ -9,10 +9,21 @@ TIMEOUT = 10
 producer = KafkaProducer(bootstrap_servers=SERVER, value_serializer=serializers.JSON)
 
 
+def clip(lower, value, upper):
+    return max(min(upper, value), lower)
+
+
 def get_data():
+    humidity = random.normalvariate(mu=50, sigma=20)
+    temperature = random.normalvariate(mu=50, sigma=20)
+
+    # avoid numbers out of range
+    humidity = clip(0.00, round(humidity, 2), 100.00)
+    temperature = clip(0, int(temperature), 100)
+
     return SensorData(
-        temperature=round(random.uniform(0, 100), 2),
-        humidity=random.randint(0, 100),
+        temperature,
+        humidity,
         wind_direction=random.choice(list(Direction)),
     )
 
