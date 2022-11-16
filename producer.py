@@ -1,19 +1,24 @@
-from constants import *
+from common import *
 from serial import serializers
 from kafka import KafkaProducer
 import random
 from time import sleep
 
+TIMEOUT = 10
 
-TIMEOUT=10
+producer = KafkaProducer(bootstrap_servers=SERVER, value_serializer=serializers.JSON)
 
 
-producer = KafkaProducer(bootstrap_servers=SERVER, value_serializer=serializers.COMPACT)
+def get_data():
+    return SensorData(
+        temperature=round(random.uniform(0, 100), 2),
+        humidity=random.randint(0, 100),
+        wind_direction=random.choice(list(Direction)),
+    )
+
 
 while True:
-    producer.send(TOPIC, {
-        'temp': round(random.uniform(0, 100), 2),
-        'humidity': random.randint(0, 100),
-        'wind': random.choice(WIND_DIRECTIONS)
-    }).get(TIMEOUT)
+    data = get_data()
+    print(f"SENDING: {data}")
+    producer.send(TOPIC, data).get(TIMEOUT)
     sleep(TIMEOUT)

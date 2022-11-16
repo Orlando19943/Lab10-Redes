@@ -1,28 +1,29 @@
 import json
-from constants import WIND_DIRECTIONS
+from common import Direction, SensorData
 
-def JSON(v):
-    b = json.dumps(v)
+
+def JSON(v: SensorData):
+    b = json.dumps({
+        'temp': v.temperature,
+        'humidity': v.humidity,
+        'wind': v.wind_direction.name,
+    })
     return b.encode('utf-8')
 
-def compact(v, bits):
+
+def __compact(v, bits):
     return format(v, 'b')[:bits].zfill(bits)
 
-def COMPACT(v):
-    print(f"TRANSLATING: {v}")
-    # 14 bits - para temp 0-100.00
+
+def COMPACT(v: SensorData):
+    # 14 bits - para temp 0.00-100.00
     # 7 bits - para humedad 0-100
-    # 3 bits - para direccion del viento 0-7
-    temp = compact(int(v['temp']*100), 14)
-    humidity = compact(v['humidity'], 7)
-    wind = compact(WIND_DIRECTIONS.index(v['wind']), 3)
+    # 3 bits - para dirección del viento 0-7
+    temp = __compact(int(v.temperature * 100), 14)
+    humidity = __compact(v.humidity, 7)
+    wind = __compact(v.wind_direction.value, 3)
 
     binary = temp + humidity + wind
-    print(f"SENDING {binary}")
 
-    # convert binary to int
-
-    # Convert to bytes
+    # Convert bitstring to bytes
     return int(binary, 2).to_bytes(3, byteorder='big')
-
-
