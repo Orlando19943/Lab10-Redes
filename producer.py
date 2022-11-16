@@ -18,8 +18,8 @@ def get_data():
     temperature = random.normalvariate(mu=50, sigma=20)
 
     # avoid numbers out of range
-    humidity = clip(0.00, round(humidity, 2), 100.00)
-    temperature = clip(0, int(temperature), 100)
+    humidity = clip(0, int(humidity), 100)
+    temperature = clip(0.00, round(temperature, 2), 100.00)
 
     return SensorData(
         temperature,
